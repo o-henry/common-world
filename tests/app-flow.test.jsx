@@ -3,7 +3,7 @@ import React from 'react';
 import {render,screen,within,cleanup} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 vi.mock('../src/world.js',async original=>{const m=await original();return {...m,mountWorld:vi.fn(()=>({select:vi.fn(),borders:vi.fn(),updateOwners:vi.fn(),setWorks:vi.fn(),turn:vi.fn(),dispose:vi.fn()}))};});
-import {App} from '../src/App.jsx';
+import {LegacyApp as App} from '../src/App.jsx';
 import {LEAGUE_KEY} from '../src/league-storage.js';
 beforeAll(()=>{HTMLDialogElement.prototype.showModal=function(){this.open=true;};HTMLDialogElement.prototype.close=function(){this.open=false;};});
 beforeEach(()=>localStorage.clear());afterEach(()=>cleanup());

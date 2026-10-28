@@ -7,6 +7,7 @@ import {createLeague,getRound,eligibleWorks,selectFrontier,registerLeagueWork,re
 import {loadLeague,saveLeague,LEAGUE_KEY} from './league-storage.js';
 import {FrontierPanel} from './FrontierPanel.jsx';
 import './frontier.css';
+import {CompetitionApp} from './CompetitionApp.jsx';
 const world=createNeighborhoodWorld();
 const fresh=()=>createLeague(leagueForNeighborhood(world));
 const getStorage=()=>{try{return window.localStorage;}catch{return null;}};
@@ -15,7 +16,7 @@ const kindNames={game:'게임',music:'음악 도구',code:'개발 도구',schedu
 const covers={game:'/assets/lumen-hop-cover.png',music:'/assets/velvet-loop-cover.png',code:'/assets/quiet-code-cover.png',schedule:'/assets/together-cover.png'};
 function Modal({title,onClose,children,wide}){const ref=useRef(null);useEffect(()=>{const d=ref.current;d.showModal();return()=>d.close();},[]);return <dialog ref={ref} className={'modal '+(wide?'wide':'')} onCancel={onClose} onClick={e=>{if(e.target===ref.current)onClose();}}><div className="modal-head"><span>{title}</span><button onClick={onClose} aria-label="닫기"><X size={21}/></button></div>{children}</dialog>}
 function Experience({work,onComplete}){const [actions,setActions]=useState(0);return <div className="experience"><img src={work.cover} alt={work.title+' 표지'}/><div className="experience-body"><span className="eyebrow">로컬 인터랙션 미리보기</span><h3>{work.title}</h3><p>실제 사용자 코드를 실행하지 않는 프로토타입 체험입니다.</p><button className="primary" onClick={()=>setActions(n=>n+1)}><Play weight="fill" size={17}/>{work.kind==='music'?'리듬 인터랙션':work.kind==='schedule'?'함께 가능한 날짜 선택':work.kind==='code'?'코드 미리보기':'점프 인터랙션'}</button><div className="demo-response" aria-live="polite">{actions?`인터랙션 ${actions}회 완료`:'버튼을 눌러 반응을 확인하세요.'}</div><button className="text-link" disabled={!actions} onClick={onComplete}>체험 완료 <Check size={16}/></button></div></div>}
-export function App(){
+export function LegacyApp(){
  const [loaded]=useState(()=>loadLeague(getStorage(),fresh));
  const [state,setState]=useState(loaded.state),[selectedId,setSelectedId]=useState('lumen'),[view,setView]=useState('world'),[focus,setFocus]=useState(null),[modal,setModal]=useState(null),[notice,setNotice]=useState(loaded.message),[error,setError]=useState(''),[revisionNote,setRevisionNote]=useState(''),[revisionDescription,setRevisionDescription]=useState(''),[revisionCover,setRevisionCover]=useState('');
  const [title,setTitle]=useState(''),[rights,setRights]=useState(false),[cover,setCover]=useState('/assets/lumen-hop-cover.png'),[ai,setAi]=useState('Claude');const [kind,setKind]=useState('game');const [storageBlocked,setStorageBlocked]=useState(loaded.blocked),[storageMessage,setStorageMessage]=useState(loaded.blocked?loaded.message:'');
@@ -45,3 +46,5 @@ export function App(){
  {modal==='reset'&&<Modal title="연습 기록 초기화" onClose={()=>setModal(null)}><div className="record-body"><p>이 브라우저의 작품 등록·개선 버전·전적·영토 변경을 모두 처음 상태로 되돌립니다.</p><button className="primary full" onClick={reset}>연습 기록을 지우고 처음부터</button><button className="text-link" onClick={()=>setModal(null)}>기록 유지하기</button></div></Modal>}
  </div>;
 }
+
+export function App(){return new URLSearchParams(window.location.search).get('legacy')==='v006' ? <LegacyApp/> : <CompetitionApp/>;}

@@ -11,7 +11,7 @@ vi.mock('../src/world.js', async original => {
     return {select: vi.fn(), borders: vi.fn(), updateOwners: vi.fn(), setWorks: vi.fn(), turn: vi.fn(), dispose: vi.fn()};
   })};
 });
-import {App} from '../src/App.jsx';
+import {LegacyApp as App} from '../src/App.jsx';
 import {LEAGUE_KEY} from '../src/league-storage.js';
 
 beforeAll(() => {

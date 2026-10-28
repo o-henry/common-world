@@ -5,7 +5,7 @@ import {projectNeighborhood} from './neighborhood-model.js';
 import {initialMapCamera, mapViewBox, zoomMap, panMap, mapPointer} from './map-camera.js';
 import './neighborhood.css';
 
-const phase = round => round.applied ? '결과 확정' : round.submission ? '평가 중' : '출전 모집';
+const phase = round => round.applied ? '결과 확정' : (round.submissions ? round.submissions.A && round.submissions.B : round.submission) ? '평가 중' : '출전 모집';
 const pointsText = points => points.map(point => point.join(',')).join(' ');
 const teamName = owner => TEAMS[owner]?.name || '미점유';
 
@@ -16,8 +16,8 @@ function RegionMap({world, state, selected, anchor, stakes, changedCell, before,
   const workAt = new Map(state.works.map(work => [work.cellId, work]));
   const owners = [...state.owners];
   if (before && latest?.result.territoryChanged) {
-    const owner = latest.result.outcome === 'claude'
-      ? state.frontiers.find(frontier => frontier.id === latest.frontierId).opponentTeam : 0;
+    const owner = latest.result.previousOwner ?? (latest.result.outcome === 'claude'
+      ? state.frontiers.find(frontier => frontier.id === latest.frontierId).opponentTeam : 0);
     owners[latest.result.changedCell] = owner;
   }
   useEffect(() => setCamera(initialMapCamera()), [anchor]);
@@ -174,7 +174,7 @@ export function NeighborhoodAtlas({world, state, selected, onSelect, onEmpty, on
       {latest && !emptyRegion && <div className="map-result" aria-live="polite"><span><strong>{latest.result.territoryChanged ? '이 경계가 달라졌습니다.' : '이번 경계는 유지됐습니다.'}</strong><small>{state.frontiers.find(item => item.id === latest.frontierId)?.title} · ROUND {latest.number}</small></span>
         {latest.result.territoryChanged && <div className="map-time-toggle" aria-label="최근 경기 전후 비교"><button aria-pressed={before} onClick={() => setBefore(true)}>경기 전</button><button aria-pressed={!before} onClick={() => setBefore(false)}>현재</button></div>}</div>}
       <div className="neighborhood-frontiers" aria-label="지도 주변 접경전">{nearbyFrontiers.map(item =>
-        <button key={item.id} onClick={() => onSelectFrontier(item.id)}><span className="boundary-colors"><i style={{background:TEAMS[0].color}}/><i style={{background:TEAMS[item.opponentTeam].color}}/></span><span><strong>{item.title}</strong><small>{phase(state.rounds[item.id])}</small></span><ArrowUpRight size={16}/></button>)}</div>
+        <button key={item.id} onClick={() => onSelectFrontier(item.id)}><span className="boundary-colors"><i style={{background:TEAMS[item.homeTeam ?? 0].color}}/><i style={{background:TEAMS[item.opponentTeam].color}}/></span><span><strong>{item.title}</strong><small>{phase(state.rounds[item.id])}</small></span><ArrowUpRight size={16}/></button>)}</div>
     </div>
   </div>;
 }
