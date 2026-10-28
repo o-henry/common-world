@@ -17,3 +17,41 @@ test('more than 200 legitimate history entries are not discarded by an arbitrary
  state.history=Array.from({length:201},(_,i)=>({frontierId:'f',roundId:`f-${i+1}`,number:i+1,submission:work,opponent:work,feedback:'가상 동률',result:{outcome:'tie',territoryChanged:false,changedCell:null,claude:6,opponent:6,valid:12}}));
  const s=store();saveLeague(s,state);const restored=loadLeague(s,fresh);assert.equal(restored.blocked,false);assert.equal(restored.state.history.length,201);
 });
+
+test('neutral unused plots roundtrip without creating a faction claim',()=>{
+ const state={...fresh(),owners:[0,1,-1],initialOwners:[0,1,-1],neighbors:[[1,2],[0],[0]]};
+ const s=store();assert.equal(saveLeague(s,state).ok,true);
+ const restored=loadLeague(s,()=>structuredClone(state));
+ assert.equal(restored.blocked,false);assert.deepEqual(restored.state.owners,[0,1,-1]);
+ assert.deepEqual(restored.state.initialOwners,[0,1,-1]);
+});
+
+test('new storage namespace never reads, overwrites or clears the old prototype record',()=>{
+ const oldKey='common:frontier-league:v1',oldRecord='v005-user-record-preserved-verbatim';
+ const values=new Map([[oldKey,oldRecord]]),accesses=[];
+ const s={getItem(key){accesses.push(['get',key]);return values.get(key)||null;},setItem(key,value){accesses.push(['set',key]);values.set(key,value);},removeItem(key){accesses.push(['remove',key]);values.delete(key);}};
+ assert.equal(LEAGUE_KEY,'common:frontier-neighborhood:v1');
+ const freshLoad=loadLeague(s,fresh);assert.equal(freshLoad.blocked,false);
+ assert.deepEqual(freshLoad.state,fresh());
+ assert.equal(saveLeague(s,initial).ok,true);assert.equal(loadLeague(s,fresh).blocked,false);
+ // The app's explicit reset removes only its exported current key.
+ s.removeItem(LEAGUE_KEY);assert.equal(loadLeague(s,fresh).blocked,false);
+ assert.equal(values.get(oldKey),oldRecord);
+ assert(accesses.every(([,key])=>key===LEAGUE_KEY));
+});
+
+test('invalid neutral works, neutral stakes and out-of-range owners preserve the saved text',()=>{
+ const base={...fresh(),owners:[0,1,-1],initialOwners:[0,1,-1],neighbors:[[1,2],[0],[0]]};
+ for(const mutate of [state=>{state.works[0].cellId=2},state=>{state.rounds.f.targetCell=2},state=>{state.rounds.f.homeCell=2},state=>{state.owners[2]=-2},state=>{state.owners[2]=0.5},state=>{state.owners[2]=6}]){
+  const state=structuredClone(base);mutate(state);const s=store(),text=JSON.stringify({schema:1,state});s.setItem(LEAGUE_KEY,text);
+  assert.equal(loadLeague(s,()=>structuredClone(base)).blocked,true);assert.equal(s.getItem(LEAGUE_KEY),text);
+ }
+});
+
+test('restoration capacity follows actual plot count instead of the old 150-work ceiling',()=>{
+ const state=fresh();state.owners=Array(160).fill(0);state.owners[1]=1;state.initialOwners=[...state.owners];
+ state.neighbors=Array.from({length:160},(_,id)=>id===0?[1]:id===1?[0]:[]);
+ state.works=Array.from({length:160},(_,id)=>({...initial.works[0],id:`work-${id}`,cellId:id,title:`Work ${id}`}));
+ const s=store();assert.equal(saveLeague(s,state).ok,true);const restored=loadLeague(s,()=>structuredClone(state));
+ assert.equal(restored.blocked,false);assert.equal(restored.state.works.length,160);
+});

@@ -11,8 +11,9 @@ const SCORES = {
 };
 const fail = (code, message) => { throw new ArenaRuleError(code, message); };
 const copy = value => structuredClone(value);
-const team = value => typeof value === 'number' && value >= 0 && value < TEAMS.length
+const team = value => Number.isInteger(value) && value >= 0 && value < TEAMS.length
   ? value : TEAMS.findIndex(name => name.toLowerCase() === String(value).toLowerCase());
+const validOwner = value => value === -1 || team(value) >= 0;
 const validCell = (id, owners) => Number.isInteger(id) && id >= 0 && id < owners.length;
 function frozen(value) {
   if (value && typeof value === 'object') {
@@ -60,7 +61,7 @@ function requireInProgress(round) {
 }
 
 export function createLeague({ owners, neighbors, works = [], frontiers = [] } = {}) {
-  if (!Array.isArray(owners) || !owners.length || owners.some(owner => team(owner) < 0)) {
+  if (!Array.isArray(owners) || !owners.length || owners.some(owner => !validOwner(owner))) {
     fail('INVALID_OWNERS', '유효한 영토 정보가 필요합니다.');
   }
   if (!Array.isArray(neighbors) || neighbors.length !== owners.length
@@ -71,7 +72,7 @@ export function createLeague({ owners, neighbors, works = [], frontiers = [] } =
     if (neighbors[id].some(n => !neighbors[n].includes(id))) fail('INVALID_NEIGHBORS', '인접 관계가 대칭이어야 합니다.');
   }
   if (!Array.isArray(works) || works.some(work => typeof work.id !== 'string' || !work.id
-    || !validCell(work.cellId, owners)) || new Set(works.map(work => work.id)).size !== works.length
+    || !validCell(work.cellId, owners) || team(owners[work.cellId]) < 0) || new Set(works.map(work => work.id)).size !== works.length
     || new Set(works.map(work => work.cellId)).size !== works.length) {
     fail('INVALID_WORKS', '작품 ID와 전시 자리는 서로 겹치지 않아야 합니다.');
   }

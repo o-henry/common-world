@@ -72,6 +72,50 @@ test('new work occupies a vacant Claude plot without generating territory', () =
   code(() => registerLeagueWork(initial, { title: 'bad', kind: 'game', creationAI: 'Claude' }), 'RIGHTS_REQUIRED');
 });
 
+test('unclaimed cells remain neutral through registration and every match result', () => {
+  const initial = fixture({ owners: [0, 1, 0, 3, 0, 1, 3, 0, -1] });
+  const registered = registerLeagueWork(initial, { title: 'A neighbor', kind: 'game', rights: true, creationAI: 'Local', cover: '/neighbor.png' });
+  assert.equal(registered.works.at(-1).cellId, 7);
+  assert.deepEqual(registered.owners, initial.owners);
+  for (const outcome of ['claude', 'opponent', 'tie', 'insufficient']) {
+    const finished = finalizeFrontier(voted(initial), outcome);
+    assert.equal(finished.owners[8], -1);
+    assert.equal(finished.initialOwners[8], -1);
+    const next = openNextRound(finished), round = getRound(next);
+    assert.equal(next.owners[round.homeCell], 0);
+    assert.equal(next.owners[round.targetCell], 1);
+    assert.deepEqual(next.owners, finished.owners);
+  }
+});
+
+test('unclaimed land is neither a vacant Claude plot nor a legal creation location', () => {
+  const base = fixture();
+  const input = {
+    owners: [0, 1, -1], neighbors: graph(3, [[0, 1], [0, 2]]),
+    works: [base.works[0], base.works.find(work => work.id === 'op-a')],
+    frontiers: [base.frontiers[0]],
+  };
+  const initial = createLeague(input);
+  code(() => registerLeagueWork(initial, { title: 'No free claim', kind: 'game', rights: true, creationAI: 'Claude' }), 'NO_VACANT_PLOT');
+  assert.deepEqual(initial.owners, [0, 1, -1]);
+  code(() => createLeague({ ...input, works: [...input.works, { ...base.works[1], cellId: 2 }] }), 'INVALID_WORKS');
+});
+
+test('neutral home or target cannot become a frontier stake, and invalid owners are rejected', () => {
+  const base = fixture(), neighbors = base.neighbors.map(ids => [...ids]);
+  neighbors[0].push(8); neighbors[8].push(0);
+  neighbors[1].push(8); neighbors[8].push(1);
+  const owners = [...base.owners]; owners[8] = -1;
+  for (const changes of [{ homeCell: 0, targetCell: 8 }, { homeCell: 8, targetCell: 1 }]) {
+    code(() => fixture({ owners, neighbors, frontiers: [{ ...base.frontiers[0], ...changes }] }), 'INVALID_STAKES');
+  }
+  const stale = { ...voted(fixture({ owners })), owners: owners.map((owner, id) => id === 1 ? -1 : owner) };
+  code(() => finalizeFrontier(stale, 'claude'), 'STALE_STAKES');
+  for (const invalid of [-2, 0.5, 6, undefined]) {
+    code(() => fixture({ owners: owners.map((owner, id) => id === 8 ? invalid : owner) }), 'INVALID_OWNERS');
+  }
+});
+
 test('revision preserves creator, AI and plot while frozen entries retain the submitted version', () => {
   const entered = enterFrontier(fixture(), 'lumen');
   const next = reviseWork(entered, 'lumen', { changeNote: '첫 점프 버튼을 더 크게 바꿨습니다.', cover: '/new.png', description: 'Improved input' });
