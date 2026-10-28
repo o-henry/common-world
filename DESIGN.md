@@ -31,3 +31,13 @@ User authorized the Wplace-informed implementation after comparing the existing 
 - Old browser save key is untouched. New region-world records use an isolated key and retain corruption/quota guards.
 
 Actual same-viewport desktop/mobile screenshot comparison and WebGL performance remain unverified. Geometry/math/component checks do not establish visual quality or enjoyment.
+
+## v007 — competition is the principal inspector
+
+The user confirmed AI factions compete through outputs and authorized this implementation. Preserve the selected v004 palette, globe/local-map navigation and flat inspector. The home inspector now presents the current faction matchup, common task, both submission states, criterion summary and comparison action. Actual local records drive territory deltas and faction standings; no external AI statistics are fabricated.
+
+The separate competition state supports both submission sides, any adjacent faction pair, immutable HTML/metadata versions, evaluator-reported functional checks and a separate preference choice. Only an explicit finalization derives a result from stored ballots. Among two compliant works, a preference winner needs more than half of all valid responses. Ties, insufficient evidence and unresolved functionality preserve the border. The practice quorum is explicitly one local-role response, not an independent-user count or public-competition rule.
+
+The bundled games are runnable reference implementations authored in the same Codex session, with illustrative faction assignments. Their records must not be described as different providers' verified output. User uploads have separate AI declarations and faction membership. Uploads remain in browser storage, with a separate v007 key and guarded asynchronous file selection. The prior interface remains recoverable through ?legacy=v006 and Git tags.
+
+HTML is rendered only after an explicit play action in an opaque allow-scripts iframe, never in the parent DOM. CSP limits resource types; it is not complete server/network/process isolation. Parent UI does not accept app-sent messages as passed checks. Actual browser/WebGL, screenshots, responsive/touch measurement, sandbox enforcement and enjoyment remain unverified.

@@ -54,3 +54,11 @@ Read-only independent review found three code-level issues: distant neutral loca
 Browser/E2E, actual WebGL, desktop/narrow screenshots, keyboard/touch exploratory review and device performance remain unverified under the prior browser-policy restriction. No alternative browser/protocol was used to bypass it.
 
 final result: blocked
+
+## v007 — bilateral output competition
+
+Built on the existing palette/globe/flat inspector. Home now presents a matchup and actual local submission/ballot states. Two reference HTML games execute in an allow-scripts sandbox. They are same-session examples with illustrative faction assignments, not evidence of independent providers' capabilities.
+
+Source-level independent review identified standings API mismatch, lost revision metadata, AI-declaration/faction conflation and stale asynchronous upload races. These were corrected. Unit/Node-VM/component behavior checks are recorded separately. No browser-policy workaround or runtime screenshot was used. Real iframe/CSP enforcement, WebGL, visual fidelity, desktop/mobile/touch, process/resource isolation and multiuser authorization remain unverified.
+
+final result: blocked
