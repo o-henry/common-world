@@ -1,6 +1,6 @@
 {
-  "name": "prototype-v004",
-  "version": "0.0.0",
+  "name": "common-world",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "vite build && node scripts/prepare-sites-build.mjs",
     "preview": "vite preview",
     "test:sites": "node --test tests/sites-worker.test.mjs",
-    "test": "node --test src/arena-model.test.js src/world.test.js src/league-model.test.js src/league-storage.test.js src/league-integration.test.js && vitest run tests/app-flow.test.jsx"
+    "test": "node --test src/arena-model.test.js src/world.test.js src/neighborhood-model.test.js src/neighborhood-integration.test.js src/map-camera.test.js src/league-model.test.js src/league-storage.test.js src/league-integration.test.js && vitest run"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
@@ -23,5 +23,6 @@
     "@testing-library/user-event": "^14.6.8",
     "jsdom": "^26.1.0",
     "vitest": "^3.2.7"
-  }
+  },
+  "license": "MIT"
 }
