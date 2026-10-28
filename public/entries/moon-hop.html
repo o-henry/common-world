@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lumen Hop — playable study</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#171d3b;color:#fff1d8;font:14px/1.5 system-ui,-apple-system,sans-serif}.game{max-width:1000px;margin:auto;padding:18px}header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 12px}h1{font:28px Georgia,serif;margin:0}header p{margin:4px 0 0;color:#b9bed4;font-size:12px}.score{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}.score b{font-size:26px;display:block}canvas{width:100%;height:auto;display:block;border-radius:16px;background:#171d3b;touch-action:none;cursor:pointer}footer{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:14px}#status{color:#c8c7dc;font-size:12px;margin:0;max-width:600px}button{font:600 14px system-ui;border:0;background:#ee9c77;color:#291b35;border-radius:30px;padding:13px 24px;min-width:145px;cursor:pointer}button:focus-visible,canvas:focus-visible{outline:3px solid #ffe2a4;outline-offset:4px}.credit{color:#929ab8;font-size:10px;margin:15px 0 0}@media(max-width:520px){.game{padding:12px}h1{font-size:23px}header p{font-size:10px}footer{gap:10px;align-items:flex-start}button{min-width:110px;padding:12px 15px}#status{font-size:11px}}
+</style></head><body><main class="game"><header><div><h1>Lumen Hop</h1><p>한 번의 점프로, 달빛 길을 조금 더 멀리.</p></div><div class="score">DISTANCE<b id="score">0</b></div></header><canvas id="game" width="960" height="520" tabindex="0" aria-label="달빛 길 점프 게임. Space 또는 점프 버튼으로 조작합니다."></canvas><footer><p id="status" role="status">Space 또는 시작 버튼. 다가오는 돌 앞에서 다시 눌러 점프하세요.</p><button id="action" type="button">시작하기 · Space</button></footer><p class="credit">COMMON의 같은 개발 세션에서 만든 플레이 예시입니다. 특정 AI 진영의 성능을 증명하지 않습니다.</p></main>
+<script>
+(() => {
+  'use strict';
+  const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+  const scoreNode=document.getElementById('score'),statusNode=document.getElementById('status'),button=document.getElementById('action');
+  const W=960,H=520,ground=407,robotX=184,robotW=37,robotH=45,speed=220;
+  let state,frame=0,last=null;
+  function stop(){if(frame)cancelAnimationFrame(frame);frame=0;last=null;}
+  function reset(){stop();state={phase:'ready',distance:0,score:0,y:ground-robotH,velocity:0,onGround:true,cleared:0};paint();}
+  function start(){stop();state={phase:'running',distance:0,score:0,y:ground-robotH,velocity:0,onGround:true,cleared:0};paint();schedule();}
+  function obstacle(index){return {x:600+index*278,width:36+(index%3)*7,height:34+(index%2)*15};}
+  function fail(){state.phase='failed';stop();}
+  function update(dt){
+    if(state.phase!=='running')return;
+    state.distance+=speed*dt;state.velocity+=1450*dt;state.y+=state.velocity*dt;
+    if(state.y>=ground-robotH){state.y=ground-robotH;state.velocity=0;state.onGround=true;}
+    for(let index=Math.max(0,state.cleared-1);index<state.cleared+4;index++){
+      const block=obstacle(index),x=block.x-state.distance;
+      if(x+block.width<robotX&&index>=state.cleared)state.cleared=index+1;
+      if(x<robotX+robotW-5&&x+block.width>robotX+5&&state.y+robotH-4>ground-block.height){fail();break;}
+    }
+    state.score=Math.floor(state.distance/14)+state.cleared*10;
+  }
+  function advance(seconds){let remaining=Math.max(0,Math.min(Number(seconds)||0,30));while(remaining>0&&state.phase==='running'){const step=Math.min(remaining,1/120);update(step);remaining-=step;}paint();}
+  function schedule(){if(state.phase==='running'&&!frame)frame=requestAnimationFrame(loop);}
+  function loop(time){frame=0;if(state.phase!=='running')return;const dt=last===null?0:Math.min((time-last)/1000,.05);last=time;advance(dt);schedule();}
+  function act(){
+    if(state.phase==='ready'||state.phase==='failed'){start();return;}
+    if(state.phase==='paused'){state.phase='running';paint();schedule();return;}
+    if(state.onGround){state.velocity=-510;state.onGround=false;}paint();
+  }
+  function round(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+  function paint(){
+    ctx.clearRect(0,0,W,H);const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#1b2144');sky.addColorStop(1,'#3c3155');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#ffe4a1';ctx.beginPath();ctx.arc(750,131,75,0,Math.PI*2);ctx.fill();ctx.fillStyle='#edca85';ctx.beginPath();ctx.arc(730,113,10,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(777,156,16,0,Math.PI*2);ctx.fill();
+    for(const [x,y,r]of [[92,83,2],[180,140,1.5],[314,75,2],[405,187,1.7],[540,113,2],[610,48,1.7],[862,75,2],[889,230,1.4],[94,265,1.8],[475,267,1.5]]){ctx.fillStyle='#fff0c0';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle='#302f50';ctx.beginPath();ctx.moveTo(0,370);for(let x=0;x<=W;x+=110)ctx.lineTo(x,340+Math.sin(x*.013)*32);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
+    round(0,ground,W,H-ground,0,'#4b3b5e');ctx.fillStyle='#e1a17e';ctx.fillRect(0,ground,W,5);
+    for(let index=Math.max(0,state.cleared-1);index<state.cleared+5;index++){const block=obstacle(index),x=block.x-state.distance;if(x>W||x+block.width<0)continue;round(x,ground-block.height,block.width,block.height,7,'#d99d78');ctx.fillStyle='#ffe5ad';ctx.fillRect(x+6,ground-block.height+6,block.width-12,4);}
+    const y=state.y;round(robotX+9,y-12,23,14,5,'#f1a58c');round(robotX,y,robotW,34,10,'#ee8c75');round(robotX+6,y+7,25,14,5,'#302840');ctx.fillStyle='#ffe8b7';ctx.fillRect(robotX+11,y+11,5,5);ctx.fillRect(robotX+24,y+11,5,5);round(robotX+3,y+32,10,13,4,'#edb197');round(robotX+24,y+32,10,13,4,'#edb197');
+    ctx.fillStyle='#ead3b4';ctx.font='13px system-ui';ctx.fillText(`돌 ${state.cleared}개 통과`,25,35);
+    if(state.phase!=='running'){
+      ctx.fillStyle='#141a35ad';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.fillStyle='#fff0cf';ctx.font='42px Georgia';ctx.fillText(state.phase==='failed'?'One more hop.':state.phase==='paused'?'잠깐 쉬는 중':'A little leap.',W/2,H/2-10);ctx.font='15px system-ui';ctx.fillStyle='#e6ccd0';ctx.fillText(state.phase==='failed'?`${state.score}점 · Space로 바로 다시 시작`:state.phase==='paused'?'버튼을 눌러 계속하기':'Space 또는 아래 버튼으로 시작',W/2,H/2+29);ctx.textAlign='left';
+    }
+    scoreNode.textContent=String(state.score);button.textContent=state.phase==='running'?'점프 · Space':state.phase==='failed'?'다시 도전 · Space':state.phase==='paused'?'계속하기 · Space':'시작하기 · Space';
+    statusNode.textContent=state.phase==='failed'?`돌에 닿았어요. ${state.cleared}개 통과 · 바로 다시 도전할 수 있습니다.`:state.phase==='running'?'Space / 버튼 한 번으로 점프. 착지하면 다시 점프할 수 있습니다.':state.phase==='paused'?'화면을 떠나 게임을 멈췄습니다. 계속하기를 누르세요.':'다가오는 돌 앞에서 점프하세요. 오래 누를 필요는 없습니다.';
+  }
+  button.addEventListener('click',act);canvas.addEventListener('pointerdown',event=>{event.preventDefault();canvas.focus();act();});
+  window.addEventListener('keydown',event=>{if(event.code==='Space'){event.preventDefault();if(!event.repeat)act();}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.phase==='running'){state.phase='paused';stop();paint();}});
+  window.addEventListener('pagehide',stop);
+  window.__COMMON_GAME_TEST__=Object.freeze({start,act,reset,tick:advance,snapshot:()=>({...state})});
+  reset();
+})();
+</script></body></html>
