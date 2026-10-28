@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { createWorld } from './world.js';
+import { createWorld, cellAtNormal, TEAMS } from './world.js';
 
 // Exercise the real private geometry builder without constructing a WebGL renderer.
 // No duplicated geometry implementation and no browser/visual claims are involved.
@@ -138,4 +138,96 @@ test('camera projection and group focus preserve the front-facing work target', 
   }
   group.children.forEach(mesh => mesh.geometry.dispose());
   material.dispose();
+});
+
+
+test('higher detail preserves a closed 642-cell world and the legacy default', () => {
+  const detailed=createWorld({detail:7});
+  assert.equal(detailed.cells.length,642);
+  assert.equal(detailed.cells.filter(c=>c.corners.length===5).length,12);
+  for(const cell of detailed.cells){
+    for(const adjacent of cell.neighbors)assert(detailed.cells[adjacent].neighbors.includes(cell.id));
+    assert.equal(cellAtNormal(detailed.cells,cell.normal),cell.id);
+  }
+  assert.equal(createWorld().cells.length,92);
+  for(const detail of [-1,0,1.5,11,Infinity])assert.throws(()=>createWorld({detail}),RangeError);
+});
+
+test('unmeshed surface picking resolves the actual spherical polygon at centers and near corners', () => {
+  const detailed=createWorld({detail:7});
+  for(const cell of detailed.cells){
+    for(let i=0;i<cell.corners.length;i++){
+      const corner=cell.corners[i],next=cell.corners[(i+1)%cell.corners.length];
+      const interior=cell.normal.clone().multiplyScalar(.12).addScaledVector(corner,.69).addScaledVector(next,.19).normalize();
+      assert.equal(cellAtNormal(detailed.cells,interior),cell.id,`Interior of ${cell.id}`);
+    }
+  }
+  assert.equal(cellAtNormal(detailed.cells,new THREE.Vector3()),undefined);
+  assert.equal(cellAtNormal([],new THREE.Vector3(0,0,1)),undefined);
+});
+
+// The actual renderer controller runs against a DOM/renderer boundary double.
+// Three geometry, camera and ray intersection remain real; no WebGL/visual claim.
+function controllerFixture({deferTextures=false}={}){
+  const listeners=new Map(),loaded=[],pending=[],renderers=[];
+  const canvas={setAttribute(){},addEventListener(name,fn){listeners.set(name,fn);},removeEventListener(name){listeners.delete(name);},getBoundingClientRect(){return {left:0,top:0,width:600,height:600};},setPointerCapture(){},hasPointerCapture(){return false;},releasePointerCapture(){},remove(){this.removed=true;}};
+  class Renderer{
+    constructor(){this.domElement=canvas;this.capabilities={getMaxAnisotropy:()=>4};renderers.push(this);}
+    setPixelRatio(){}setClearColor(){}setSize(){}
+    render(scene,camera){this.scene=scene;this.camera=camera;scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);}
+    dispose(){this.disposed=true;}
+  }
+  class Loader{
+    load(url,onLoad){const texture=new THREE.Texture({width:1600,height:900});loaded.push(texture);if(deferTextures)pending.push(()=>onLoad(texture));else onLoad(texture);return texture;}
+  }
+  const observer={disconnected:false};
+  class Observer{observe(){}disconnect(){observer.disconnected=true;}}
+  const mountSource=source.slice(source.indexOf('export function mountWorld')).replace('export function','function');
+  const mount=new Function('THREE','window','ResizeObserver','cellAtNormal','capGeometry','TEAMS',`${mountSource};return mountWorld;`)({...THREE,WebGLRenderer:Renderer,TextureLoader:Loader},{devicePixelRatio:1},Observer,cellAtNormal,capGeometry,TEAMS);
+  const container={appendChild(){},getBoundingClientRect(){return {width:600,height:600};}};
+  const detailed=createWorld({detail:7});
+  const front=detailed.cells.reduce((best,c)=>c.normal.z>best.normal.z?c:best,detailed.cells[0]);
+  const work=detailed.works[0];work.cellId=front.id;
+  detailed.works=[work];detailed.home=front.id;
+  for(const cell of detailed.cells)cell.owner=-1;
+  front.owner=0;
+  const chosen=[],empty=[],errors=[];
+  const api=mount(container,detailed,{onSelect:id=>chosen.push(id),onEmpty:id=>empty.push(id),onError:e=>errors.push(e)});
+  const renderer=renderers[0],group=renderer.scene.children.find(child=>child.isGroup);
+  const eventAt=point=>{const p=point.clone().applyMatrix4(group.matrixWorld).project(renderer.camera);return {button:0,pointerId:1,clientX:(p.x+1)*300,clientY:(1-p.y)*300};};
+  const click=normal=>{const e=eventAt(normal.clone().multiplyScalar(2.584));listeners.get('pointerdown')(e);listeners.get('pointerup')(e);};
+  return {api,detailed,front,renderer,group,chosen,empty,errors,canvas,listeners,observer,loaded,pending,click};
+}
+
+test('neutral plots stay unmeshed and front surface clicks retain the same cell identity', () => {
+  const f=controllerFixture();
+  const plotMeshes=()=>f.group.children.filter(o=>o.isMesh&&o.userData.cellId!==undefined&&o.material.color.getHexString()!=='ffffff');
+  assert.equal(plotMeshes().length,1);
+  f.click(f.front.normal);assert.deepEqual(f.chosen,['lumen']);
+  const neutral=f.detailed.cells.find(c=>c.owner===-1&&c.normal.z>.8&&c.id!==f.front.id);
+  f.click(neutral.normal);assert.deepEqual(f.empty,[neutral.id]);
+  const owners=f.detailed.cells.map(c=>c.owner);owners[neutral.id]=1;f.api.updateOwners(owners);
+  assert.equal(plotMeshes().length,2);
+  owners[neutral.id]=-1;f.api.updateOwners(owners);
+  assert.equal(plotMeshes().filter(o=>o.visible).length,1);
+  f.click(neutral.normal);assert.equal(f.empty.at(-1),neutral.id);
+  assert.equal(f.errors.length,0);
+  f.api.dispose();
+});
+
+test('backside work cannot intercept a front-facing neutral cell and controller releases its resources', () => {
+  const f=controllerFixture({deferTextures:true});
+  const backside=f.detailed.cells.reduce((best,c)=>c.normal.z<best.normal.z?c:best,f.front);
+  f.api.setWorks([{...f.detailed.works[0],cellId:backside.id,id:'backside'}],'backside');
+  f.click(f.front.normal);assert.equal(f.chosen.length,0);assert.equal(f.empty.at(-1),f.front.id);
+  const disposals=new Map();
+  f.renderer.scene.traverse(o=>{for(const item of [o.geometry,...(o.material?Array.isArray(o.material)?o.material:[o.material]:[])])if(item&&!disposals.has(item)){disposals.set(item,0);item.addEventListener('dispose',()=>disposals.set(item,disposals.get(item)+1));}});
+  const textureDisposals=f.loaded.map(texture=>{const counter={count:0};texture.addEventListener('dispose',()=>counter.count++);return counter;});
+  f.api.dispose();
+  assert(f.canvas.removed&&f.renderer.disposed&&f.observer.disconnected);
+  assert.equal(f.listeners.size,0);
+  assert([...disposals.values()].every(count=>count===1));
+  f.pending.forEach(resolve=>resolve());
+  assert(textureDisposals.every(counter=>counter.count===1),'pending textures disposed once, without attachment after unmount');
+  assert.equal(f.errors.length,0);
 });
