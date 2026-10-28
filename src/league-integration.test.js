@@ -1,0 +1,10 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createWorld} from './world.js';import {leagueSeed} from './league-seed.js';
+import {createLeague,selectFrontier,getRound,eligibleWorks,registerLeagueWork,enterFrontier,recordFrontierTrial,submitFrontierBallot,finalizeFrontier,openNextRound} from './league-model.js';
+import {saveLeague,loadLeague} from './league-storage.js';
+const fresh=()=>createLeague(leagueSeed(createWorld()));
+function contest(s,outcome){if(!eligibleWorks(s).length)s=registerLeagueWork(s,{title:'함께 약속',author:'you',creationAI:'Claude',kind:'schedule',rights:true,cover:'/assets/together-cover.png'});s=enterFrontier(s,eligibleWorks(s)[0].id);s=recordFrontierTrial(recordFrontierTrial(s,'A'),'B');s=submitFrontierBallot(s,'A',{note:'실제 조작 결과를 비교한 연습 의견'});return finalizeFrontier(s,outcome);}
+for(const id of ['moonlight','rhythm','together'])for(const outcome of ['claude','opponent','tie','insufficient'])test(`real 92-cell world ${id}/${outcome}: finalize, restore, and next boundary agree`,()=>{
+ let s=selectFrontier(fresh(),id);s=contest(s,outcome);const map=new Map(),storage={getItem:k=>map.get(k),setItem:(k,v)=>map.set(k,v)};assert.equal(saveLeague(storage,s).ok,true);const restored=loadLeague(storage,fresh);assert.equal(restored.blocked,false);assert.deepEqual(restored.state.owners,s.owners);assert.equal(restored.state.history.length,1);const next=openNextRound(restored.state),r=getRound(next);assert.equal(next.owners[r.homeCell],0);assert.equal(next.owners[r.targetCell],next.frontiers.find(f=>f.id===id).opponentTeam);assert(next.neighbors[r.homeCell].includes(r.targetCell));assert.equal(next.owners.length,92);assert.equal(r.number,2);
+});
+test('consecutive victories accumulate rather than replace ownership deltas',()=>{let s=fresh();const initial=s.owners.filter(x=>x===0).length;for(let i=0;i<3;i++){s=contest(s,'claude');assert.equal(s.history.length,i+1);assert.equal(s.owners.filter(x=>x===0).length,initial+i+1);if(i<2)s=openNextRound(s);}});

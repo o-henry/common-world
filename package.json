@@ -1,0 +1,27 @@
+{
+  "name": "prototype-v004",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/prepare-sites-build.mjs",
+    "preview": "vite preview",
+    "test:sites": "node --test tests/sites-worker.test.mjs",
+    "test": "node --test src/arena-model.test.js src/world.test.js src/league-model.test.js src/league-storage.test.js src/league-integration.test.js && vitest run tests/app-flow.test.jsx"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@vitejs/plugin-react": "5.0.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "three": "^0.186.1",
+    "vite": "6.4.2"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.7"
+  }
+}
