@@ -1,36 +1,40 @@
-# COMMON — persistent frontier prototype v005
+# COMMON
 
-The selected v004 shell, artwork and local URL are retained. Source folder stays `prototype-v004` to preserve existing links. The pre-change code/docs are preserved in `output/before-league-v005/`.
+AI와 함께 만든 작품을 구경하고, 과제별 접경전으로 진영의 경계를 바꾸는 로컬 프로토타입입니다. 플랫폼 코드와 예시 이미지는 MIT로 공개합니다. 출품작의 원작자·표지·제작 AI 신고는 현재 점유 진영과 별개입니다.
 
-## Run and try
+![v005 visual reference](docs/reference/arena-world-home-v004.png)
+
+위 이미지는 색감과 작품 패널의 기준으로 보존한 v005 참고 시안입니다. v006의 실제 실행 캡처가 아닙니다.
+
+## 실행
+
+Node.js 24에서 검사했습니다.
 
 ```sh
-npm install
+npm ci
 npm run dev -- --host 127.0.0.1 --port 4173 --strictPort
 ```
 
-Open http://127.0.0.1:4173/ on this Mac. No public deployment.
+이 Mac에서 http://127.0.0.1:4173/ 을 엽니다. 서버나 계정 없이 사용하는 브라우저 로컬 시연이며 공개 서비스 배포는 별도입니다.
 
-1. Pick a creation on the 3D world or with the keyboard-accessible work picker.
-2. Choose **접경전** or one of the three home invitations: 달빛(game), 리듬(music), 약속(schedule). Each has its own task, criteria, stakes and round state.
-3. Choose an eligible work, submit the current version or register a revised version first. If no suitable work exists, **이 과제의 작품 올리기** preselects the required work kind.
-4. Both mock experiences must be completed from the separately labeled evaluator view before submitting an evaluation/feedback.
-5. Choose a fictional aggregate scenario and explicitly confirm it. The local ballot alone never transfers land. A win transfers one adjacent staked cell; tie/insufficient votes keeps it.
-6. Read the outcome and feedback. Register an improvement with a real change note; the public gallery gets v2 while the old sealed entry remains v1.
-7. Choose **탈환전 준비하기 / 다음 접경전 열기**. The next stakes are selected from current ownership and adjacency. History survives. The least-used eligible creators on that task have priority; making another work under the same author does not bypass it.
-8. Reload to restore the world, revisions and history saved in this browser. **연습 기록 초기화** opens a confirmation dialog before clearing this prototype's key.
+## v006에서 눌러보기
 
-## Roles and limits
+1. 구체의 작품을 누르거나 **이곳 둘러보기**를 선택합니다. 전체 642칸 중 53칸만 점유한 작은 군락에 가상 작품 6개가 모여 있습니다. 나머지는 미점유 상태입니다.
+2. 같은 좌표의 평면 지역 지도에서 이웃 작품을 선택합니다. 구체와 지도·상세 패널은 같은 작품 ID와 표지를 사용합니다. 드래그·스크롤, 확대 버튼, 키보드 방향키와 +/-를 사용할 수 있습니다. 구체로 돌아가도 지역의 위치와 확대 상태를 유지합니다.
+3. 지도 아래 **달빛 / 리듬 / 약속 접경**을 선택합니다. 조건에 맞는 작품으로 출전하거나 새 작품을 등록합니다. 출전이 적은 제작자에게 우선 기회가 주어집니다.
+4. 별도 평가자 시연에서 A/B를 각각 체험하고 평가와 의견을 남깁니다. 체험은 업로드 코드를 실행하는 기능이 아닌 로컬 인터랙션 미리보기입니다.
+5. 명시된 **가상 집계**를 선택해 결과를 확정합니다. 승리·패배는 인접한 한 칸만 이전하며 동률·평가 부족은 유지합니다. 내 한 표가 즉시 영토를 바꾸지 않습니다.
+6. 지도에서 **경기 전 / 현재**로 같은 위치의 변경을 비교합니다. 표지·원작자는 보존됩니다. 피드백으로 새 버전을 등록하고 다음 접경전이나 탈환전을 이어갈 수 있습니다.
 
-All works, tasks and aggregate scenarios are fictional local examples. An example work can be revised only through a modal explicitly labeled as that author's creator-role simulation. Registering/revising does not transfer authorship or validate AI attribution. **내 작품** contains only the local `you` author's creations, not other authors' revised examples.
+빈 중립 지역에는 작품 수를 꾸며 표시하지 않습니다. **작품이 모인 곳으로** 돌아갈 수 있으며, 업로드만으로 중립 땅을 무상 지급하지 않습니다.
 
-The experience view is a local interaction preview, not a sandbox running uploaded applications. No account/authentication, real jury, real votes, remote upload storage, verified provider attribution or production security. Human+AI-assisted work outcomes are not provider benchmarks. No evidence yet that these mechanics produce enjoyment or return visits.
+## 저장과 복구
 
-## Local data
+v006은 `common:frontier-neighborhood:v1`, v005는 `common:frontier-league:v1` 키를 사용합니다. 새 버전은 이전 키를 읽거나 쓰거나 지우지 않습니다. 브라우저 저장은 백업이 아니며 같은 브라우저·접속 주소에서만 유지됩니다. 업로드 이미지는 로컬에 저장되고 서버로 전송되지 않습니다. 저장 공간이 부족하면 경고하고 기존 성공 저장본을 보존합니다.
 
-Local state uses `common:frontier-league:v1` in browser localStorage. Uploaded PNG/JPEG/WebP <=5MB is decoded locally; one side must be <=8192px. Data URLs enable local restore and are not sent to a backend. Large images can exceed browser storage quota: the UI warns, keeps the active session, and does not overwrite the prior successful snapshot. Corrupt/incompatible snapshots are preserved, automatic writes blocked, and an explicit reset is available. This is a browser-local prototype, not a durable backup system or a multiuser ledger.
+이전 소스는 `prototype-v005` 태그에 보존했습니다. [복구 방법](docs/RECOVERY.md)을 참고하세요. 현재 폴더의 로컬 백업·출력 로그·개인 지침·브라우저 기록은 공개 저장소에 포함하지 않습니다.
 
-## Checks and evidence
+## 검사와 한계
 
 ```sh
 npm test
@@ -38,15 +42,6 @@ npm run build
 npm run test:sites
 ```
 
-Model/geometry/storage integration checks use real Three math and the actual 92-cell world. React component flows run in jsdom with WebGL mocked. Browser/WebGL runtime, screenshots, visual fidelity, E2E, device performance and exploratory user testing are not verified; [design-qa.md](design-qa.md) remains **blocked** under the earlier browser policy restriction. HTTP 200 is serving evidence only.
+단위·실제 구체 데이터 통합·저장·React 컴포넌트 흐름·배포 패키지 검사를 포함합니다. React 검사에서는 WebGL renderer를 대역으로 사용합니다. 실제 브라우저/WebGL·E2E·스크린샷 비교·기기 성능·사용자 탐색과 재미는 검증되지 않았습니다. [디자인 검수 기록](design-qa.md)에서 구분합니다.
 
-Current execution receipts and logs: `output/league-v005-*`. The initial implementation receipt remains unchanged as historical evidence. Separate source artists/assets remain preserved; no new raster assets were generated for v005.
-
-## Assets and technical source
-
-- [lumen-hop-cover.png](public/assets/lumen-hop-cover.png)
-- [velvet-loop-cover.png](public/assets/velvet-loop-cover.png)
-- [together-cover.png](public/assets/together-cover.png)
-- [quiet-code-cover.png](public/assets/quiet-code-cover.png)
-
-[Selected source image](docs/reference/arena-world-home-v004.png), [Three Raycaster](https://threejs.org/docs/pages/Raycaster.html), [IcosahedronGeometry](https://threejs.org/docs/pages/IcosahedronGeometry.html).
+가상 출품작과 집계를 사용하는 시연입니다. 인증·다중 사용자 투표·실제 제작자 권한·업로드 코드 격리·AI 사용 증명은 구현하지 않았습니다. AI 표시는 제작자 신고이며 모델 자체 성능 비교가 아닙니다. [자산과 출품 권리](ASSETS.md), [디자인 기준](DESIGN.md).

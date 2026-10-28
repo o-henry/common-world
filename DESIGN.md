@@ -18,3 +18,16 @@ Visual comparison remains blocked by the prior browser tool policy denial; build
 Preserve the v004 shell/assets/camera and use the flat inspector for richer competition. Home contains three compact task invitations with real local round state. Recruiting/evaluation/finalized views replace inspector contents. Version, sealed entry, opportunity ordering and next-round action remain distinct. Empty eligibility has a direct kind-specific registration action. Interior gaps are reduced while faction boundaries are emphasized to read contiguous territory; no automatic rotation/pulsing or curved text. Cumulative ownership deltas show the actual difference from the initial world.
 
 Local state persists under a versioned key, with corrupt/blocked/quota states explicit; preserve prior good snapshots. Example author role is explicit during revision. Existing source was selected; these additional states are implemented candidates and have not received visual acceptance or screenshot comparison.
+
+## v006 — compact settlement and local map
+
+User authorized the Wplace-informed implementation after comparing the existing sparse works on preassigned land. Preserve the source palette, type hierarchy, tactile opaque globe and flat inspector. The reference image is the pre-change composition, not an exact image target for the new local map.
+
+- Keep 642 spherical plot IDs, with only a 53-plot front-facing settlement claimed. No extra fictional population is added: six disclosed works remain. Neutral land is one quiet opaque sphere, without a global grid.
+- Globe is the overview. A work/plot or settlement entry opens a tangent-plane projection of the same IDs. No automatic camera flight. Curved text remains absent; local map captions are flat text.
+- Local map retains its camera when returning through the globe. Wheel/pointer conversions account for SVG letterboxing. A distant empty region has honest copy and a return-to-settlement action. An off-map frontier focuses its actual plot.
+- Registering a work uses a vacant existing faction plot. Only an explicitly finalized synthetic match changes a stake. Before/current comparison is presentation-only, without changing the ownership ledger or authorship.
+- Small screens stack the inspector. SVG works and all navigation have keyboard paths; +/-/arrow controls accompany pointer interactions. Scene rendering remains demand-driven; only claimed plots have individual meshes.
+- Old browser save key is untouched. New region-world records use an isolated key and retain corruption/quota guards.
+
+Actual same-viewport desktop/mobile screenshot comparison and WebGL performance remain unverified. Geometry/math/component checks do not establish visual quality or enjoyment.

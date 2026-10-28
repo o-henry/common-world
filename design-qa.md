@@ -44,3 +44,13 @@ Source stays the same v004 image. Added three task/state flows, revisions, persi
 Read-only independent review found and code-fixed cumulative-delta labels, incomplete restore validation, and ambiguous example-author revision. Component/model/storage checks are separate evidence, not screenshots. Same-view desktop/mobile capture, actual WebGL, keyboard/touch exploratory checks and performance remain open.
 
 final result: blocked
+
+## v006 — neighborhood implementation
+
+The existing selected image remains the palette/inspector reference. The new local-map composition is an implemented candidate, not a screenshot-matched visual approval. No new image generation was used.
+
+Read-only independent review found three code-level issues: distant neutral locations did not focus an off-map frontier, SVG letterboxing distorted pointer coordinates, and region camera state was lost through globe navigation. These were corrected with corresponding math/component checks. This is source/behavior evidence with a mocked WebGL renderer, not a rendered visual comparison.
+
+Browser/E2E, actual WebGL, desktop/narrow screenshots, keyboard/touch exploratory review and device performance remain unverified under the prior browser-policy restriction. No alternative browser/protocol was used to bypass it.
+
+final result: blocked
