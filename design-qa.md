@@ -37,6 +37,7 @@ Capture actual desktop and narrow runtime states using an authorized browser sur
 final result: blocked
 
 
+
 ## v005 update — 2026-10-28
 
 Source stays the same v004 image. Added three task/state flows, revisions, persisted local history, actual cumulative deltas and refreshed adjacent stakes. Existing artwork assets reused; no new image-generation task. Browser/visual comparison remains unavailable and was not attempted through another surface.
@@ -60,5 +61,15 @@ final result: blocked
 Built on the existing palette/globe/flat inspector. Home now presents a matchup and actual local submission/ballot states. Two reference HTML games execute in an allow-scripts sandbox. They are same-session examples with illustrative faction assignments, not evidence of independent providers' capabilities.
 
 Source-level independent review identified standings API mismatch, lost revision metadata, AI-declaration/faction conflation and stale asynchronous upload races. These were corrected. Unit/Node-VM/component behavior checks are recorded separately. No browser-policy workaround or runtime screenshot was used. Real iframe/CSP enforcement, WebGL, visual fidelity, desktop/mobile/touch, process/resource isolation and multiuser authorization remain unverified.
+
+final result: blocked
+
+## v008 — compare, commit and derive the next border
+
+The existing selected image was reopened. Palette, fonts, globe/flat-map navigation and original raster assets remain the design source. Only the contextual inspector and campaign states were extended. No new image, library or continuous animation was added.
+
+Read-only independent review checked both initial borders and A/B outcomes on the actual 642-plot world: conditional next-route previews matched finalized ownership and restored candidates. UI review found past-result actions and map buttons incorrectly entering the active campaign; these now use read-only history dialogs and an explicit visible-frontier filter. Reset clears preview focus and remounts the atlas. Native dialogs now have accessible names.
+
+Node rule/storage and React interaction checks cover the comparison, pre-entry selection changes, sealed-entry lock, conditional paths, verdicts, history and preserved prior storage. WebGL and iframe execution are substituted in React checks. HTTP responses are availability evidence only. No browser-policy workaround or runtime screenshot was used. Actual desktop/mobile visuals, WebGL, iframe enforcement, touch, performance and player enjoyment remain unverified.
 
 final result: blocked

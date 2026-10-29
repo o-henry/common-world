@@ -41,3 +41,14 @@ The separate competition state supports both submission sides, any adjacent fact
 The bundled games are runnable reference implementations authored in the same Codex session, with illustrative faction assignments. Their records must not be described as different providers' verified output. User uploads have separate AI declarations and faction membership. Uploads remain in browser storage, with a separate v007 key and guarded asynchronous file selection. The prior interface remains recoverable through ?legacy=v006 and Git tags.
 
 HTML is rendered only after an explicit play action in an opaque allow-scripts iframe, never in the parent DOM. CSP limits resource types; it is not complete server/network/process isolation. Parent UI does not accept app-sent messages as passed checks. Actual browser/WebGL, screenshots, responsive/touch measurement, sandbox enforcement and enjoyment remain unverified.
+
+## v008 — compare two borders, then choose a campaign
+
+User authorized retaining the current UI while connecting two-border comparison, submission and different next challenges after a win or loss. Preserve the existing ivory/plum shell, proportions, globe/flat-map navigation, fonts, covers and demand-driven rendering. The selected source remains `docs/reference/arena-world-home-v004.png`; this is a contextual inspector extension, not a new art direction.
+
+- The home inspector compares up to two actual neighboring stakes, with a task, identical conditions for both sides, candidate availability and one-step win/loss route previews. A preview is conditional, never a forecast of the winner. Missing candidates and missing borders stay explicit.
+- Selection highlights the exact stake IDs on the existing map. A separate entry action opens the established competition panel. One submitted campaign locks the alternative until finalization; browsing comparison and works remains possible.
+- After the existing ballot-derived verdict, actual ownership determines the next nearby borders. A win advances the campaign focus, a loss retreats to remaining friendly territory, and a held result preserves the focus. No units, automatic land gifts, strength bonuses or invented external AI entries are added.
+- The active match uses concealed preference totals until finalization, while showing actual response counts. The two bundled games remain same-Codex reference implementations. Authorship, frozen submissions, rights and AI declarations remain independent of territory.
+- New browser storage is isolated from v007 and earlier records. `?legacy=v007` retains the preceding interface. Corrupt snapshots are preserved and quota failures remain explicit.
+- Keyboard focus/pressed/disabled states and a single-column narrow layout accompany the flat comparison. Runtime screenshot comparison remains blocked by the previous browser policy restriction; automated checks do not establish visual fidelity, performance or enjoyment.

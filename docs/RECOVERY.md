@@ -1,5 +1,9 @@
 # 복구 가능한 버전
 
+- v008 기본 화면은 접경 비교 캠페인입니다. `?legacy=v007`에서 이전 양측 출품 화면, `?legacy=v006`에서 이전 지역 지도를 엽니다.
+- v008 저장 키는 `common:campaign:v1`입니다. v007의 `common:competition:v1`과 이전 두 키를 접근·초기화하지 않습니다. 기존 출품은 이전 화면에서 확인합니다.
+- 변경 전 소스와 Git 이력은 `prototype-v007` 태그와 별도 로컬 Git bundle에 보존했습니다. 별도 폴더에 복구할 때 `git worktree add ../common-v007 prototype-v007`을 사용할 수 있습니다. Git 백업은 브라우저 데이터의 백업이 아닙니다.
+
 - `prototype-v005`: 지역 확대 도입 전의 실행 앱 기준점.
 - `main`: 구체와 평면 지역 지도가 연결된 현재 버전.
 
