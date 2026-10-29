@@ -1,6 +1,6 @@
 {
   "name": "common-world",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "vite build && node scripts/prepare-sites-build.mjs",
     "preview": "vite preview",
     "test:sites": "node --test tests/sites-worker.test.mjs",
-    "test": "node --test src/arena-model.test.js src/world.test.js src/neighborhood-model.test.js src/neighborhood-integration.test.js src/map-camera.test.js src/artifact-runtime.test.js src/competition-model.test.js src/competition-storage.test.js src/league-model.test.js src/league-storage.test.js src/league-integration.test.js && vitest run"
+    "test": "node --test src/arena-model.test.js src/world.test.js src/neighborhood-model.test.js src/neighborhood-integration.test.js src/map-camera.test.js src/artifact-runtime.test.js src/competition-model.test.js src/competition-storage.test.js src/campaign-model.test.js src/campaign-storage.test.js src/league-model.test.js src/league-storage.test.js src/league-integration.test.js && vitest run"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

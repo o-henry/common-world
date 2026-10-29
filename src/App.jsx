@@ -8,6 +8,7 @@ import {loadLeague,saveLeague,LEAGUE_KEY} from './league-storage.js';
 import {FrontierPanel} from './FrontierPanel.jsx';
 import './frontier.css';
 import {CompetitionApp} from './CompetitionApp.jsx';
+import {CampaignApp} from './CampaignApp.jsx';
 const world=createNeighborhoodWorld();
 const fresh=()=>createLeague(leagueForNeighborhood(world));
 const getStorage=()=>{try{return window.localStorage;}catch{return null;}};
@@ -47,4 +48,4 @@ export function LegacyApp(){
  </div>;
 }
 
-export function App(){return new URLSearchParams(window.location.search).get('legacy')==='v006' ? <LegacyApp/> : <CompetitionApp/>;}
+export function App(){const legacy=new URLSearchParams(window.location.search).get('legacy');return legacy==='v006' ? <LegacyApp/> : legacy==='v007' ? <CompetitionApp/> : <CampaignApp/>;}

@@ -38,7 +38,8 @@ function WorkRecord({work, latest, team}) {
 }
 
 export function CompetitionPanel({state, selectedId, actorId, evaluatorId, onTransition, onSelectWork,
-  onPlay, onEdit, onRegister, onBack, onSelectFrontier, onFocus, onActorChange}) {
+  onPlay, onEdit, onRegister, onBack, onSelectFrontier, onFocus, onActorChange,
+  campaignMode = false, onNextChallenge, nextChallengeSummary}) {
   const frontier = state.frontiers.find(item => item.id === state.activeFrontierId) || state.frontiers[0];
   const round = getCompetitionRound(state);
   const keys = frontier.checkKeys || ['controls', 'restart', 'feedback'];
@@ -113,7 +114,7 @@ export function CompetitionPanel({state, selectedId, actorId, evaluatorId, onTra
 
   return <section className="cp-panel" aria-label="AI 대결">
     <button className="back-link" onClick={onBack}><ArrowLeft size={15}/>전황으로 돌아가기</button>
-    {state.frontiers.length > 1 && <div className="cp-frontiers" aria-label="대결 선택">{state.frontiers.map(item => <button key={item.id}
+    {!campaignMode && state.frontiers.length > 1 && <div className="cp-frontiers" aria-label="대결 선택">{state.frontiers.map(item => <button key={item.id}
       aria-pressed={item.id === frontier.id} onClick={() => onSelectFrontier(item.id)}>
       <span><strong>{item.title}</strong><small>{TEAMS[item.homeTeam ?? 0]?.name} × {TEAMS[item.opponentTeam]?.name}</small></span><ArrowRight size={15}/>
     </button>)}</div>}
@@ -178,7 +179,7 @@ export function CompetitionPanel({state, selectedId, actorId, evaluatorId, onTra
         <label className="cp-note">선택 이유와 개선할 점 <span>선택 · 500자 이내</span><textarea maxLength={500} rows={3} value={note} disabled={Boolean(ballot) || selfEvaluation} onChange={event => setNote(event.target.value)} placeholder="실제로 확인한 장점과 다음 버전에 바라는 점을 남겨주세요."/></label>
         <button className="primary full" disabled={!trials.A || !trials.B || !choice || Boolean(ballot) || selfEvaluation}>{ballot ? <><Check size={16}/>이 평가자의 응답 접수 완료</> : <>기능 확인과 선호 평가 제출 <ArrowRight size={17}/></>}</button>
       </form>
-      <div className="cp-tally"><span className="eyebrow">현재 접수된 응답</span><strong>{round.ballots.length}건 <small>이 브라우저의 로컬 기록</small></strong><dl>{Object.entries(preferenceNames).map(([value, label]) => <div key={value}><dt>{label}</dt><dd>{counts[value] || 0}</dd></div>)}</dl></div>
+      <div className="cp-tally"><span className="eyebrow">현재 접수된 응답</span><strong>{round.ballots.length}건 <small>이 브라우저의 로컬 기록</small></strong>{campaignMode ? <p className="cp-muted">선택별 집계는 결과 확정 후 공개합니다.</p> : <dl>{Object.entries(preferenceNames).map(([value, label]) => <div key={value}><dt>{label}</dt><dd>{counts[value] || 0}</dd></div>)}</dl>}</div>
       <button className="primary full cp-finalize" disabled={round.ballots.length === 0} onClick={confirmResult}>평가·조건 확인 후 결과 확정 <ArrowRight size={17}/></button>
       <p className="cp-muted">연습 정족수 {state.quorum ?? frontier.quorum ?? 1}건입니다. 실제 공개 대회 기준이 아닙니다. 필수 기능을 충족하지 못한 쪽은 승리할 수 없습니다. 판단 보류·동률·평가 부족은 경계를 유지합니다.</p>
     </>}
@@ -194,7 +195,8 @@ export function CompetitionPanel({state, selectedId, actorId, evaluatorId, onTra
       <div className="cp-section-heading"><h3>평가 근거</h3><span>기능 확인과 선호 구분</span></div>
       {round.ballots.map((record, index) => <div className="cp-evidence" key={record.evaluatorId || index}><strong>평가 {index + 1} · {preferenceNames[record.choice]}</strong><dl>{SIDES.map(item => <div key={item}><dt>작품 {item}</dt><dd>{keys.map(key => `${checkNames[key] || key}: ${checkChoices[record.checks?.[item]?.[key]] || '판단하지 못함'}`).join(' · ')}</dd></div>)}</dl>{record.note && <p>{record.note}</p>}</div>)}
       {text(result?.feedback) && <p className="cp-feedback">{text(result.feedback)}</p>}
-      <button className="primary full cp-rematch" onClick={rematch}>{result?.territoryChanged ? '개선해서 다음 접경에 다시 도전' : '조건을 보완하고 재대결 준비'}<ArrowRight size={17}/></button>
+      {campaignMode && nextChallengeSummary}
+      <button className="primary full cp-rematch" onClick={onNextChallenge || rematch}>{onNextChallenge ? '변경된 다음 접경 비교하기' : result?.territoryChanged ? '개선해서 다음 접경에 다시 도전' : '조건을 보완하고 재대결 준비'}<ArrowRight size={17}/></button>
       <div className="cp-revision-links">{SIDES.map(item => {const work = state.works.find(entry => entry.id === submissions[item].id); return work && <button className="text-link" key={item} disabled={(work.creatorId || work.author) !== actorId} onClick={() => onEdit?.(work)}><PencilSimple size={14}/>{teamFor(frontier, item)?.name} 피드백 반영한 새 버전</button>;})}</div>
       <p className="cp-muted">현재 제작자 역할과 일치하는 작품만 수정합니다. 새 버전을 등록한 뒤에도 이전 경기의 제출 파일·평가·판정은 보존됩니다.</p>
     </>}

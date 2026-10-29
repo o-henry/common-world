@@ -114,7 +114,7 @@ function RegionMap({world, state, selected, anchor, stakes, changedCell, before,
   </div>;
 }
 
-export function NeighborhoodAtlas({world, state, selected, onSelect, onEmpty, onError, focus, frontier = [], onSelectFrontier}) {
+export function NeighborhoodAtlas({world, state, selected, onSelect, onEmpty, onError, focus, frontier = [], onSelectFrontier, visibleFrontierIds}) {
   const host = useRef(null), api = useRef(null), handlers = useRef({onSelect, onEmpty, onError});
   const [mode, setMode] = useState('globe'), [anchor, setAnchor] = useState(world.centerCellId);
   const [camera, setCamera] = useState(initialMapCamera);
@@ -151,7 +151,8 @@ export function NeighborhoodAtlas({world, state, selected, onSelect, onEmpty, on
   const visibleWorks = state.works.filter(work => projectedIds.has(work.cellId));
   const emptyRegion = visibleWorks.length === 0;
   const regionName = emptyRegion ? '미점유 지역' : '달빛 지구';
-  const nearbyFrontiers = state.frontiers.filter(item => projectedIds.has(state.rounds[item.id].homeCell) || projectedIds.has(state.rounds[item.id].targetCell));
+  const displayedFrontiers = visibleFrontierIds ? state.frontiers.filter(item=>visibleFrontierIds.includes(item.id)) : state.frontiers;
+  const nearbyFrontiers = displayedFrontiers.filter(item => projectedIds.has(state.rounds[item.id].homeCell) || projectedIds.has(state.rounds[item.id].targetCell));
   return <div className="neighborhood-atlas" data-mode={mode}>
     <div className="atlas-toolbar">
       <div className="atlas-breadcrumb"><button onClick={() => setMode('globe')}>월드</button>{mode === 'region' && <><span>/</span><strong>{regionName}</strong></>}</div>
@@ -162,7 +163,7 @@ export function NeighborhoodAtlas({world, state, selected, onSelect, onEmpty, on
     </div>
     <div hidden={mode !== 'globe'} className="atlas-globe-container">
       <div className="globe-stage" ref={host} data-testid="world-stage"/>
-      <div className="settlement-entry"><span><strong>달빛 지구</strong><small>{localWorks}개의 작품 · {state.frontiers.length}개의 접경전</small></span>
+      <div className="settlement-entry"><span><strong>달빛 지구</strong><small>{localWorks}개의 작품 · {displayedFrontiers.length}개의 접경전</small></span>
         <button className="primary" onClick={() => enterRegion(world.centerCellId)}>이곳 둘러보기 <ArrowUpRight size={17}/></button></div>
       <div className="rotation"><button onClick={() => api.current?.turn(-1)} aria-label="왼쪽 회전"><ArrowLeft size={16}/></button><span>작품이 모인 곳을 찾아보세요.</span><button onClick={() => api.current?.turn(1)} aria-label="오른쪽 회전"><ArrowRight size={16}/></button></div>
     </div>

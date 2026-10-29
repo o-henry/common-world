@@ -9,7 +9,7 @@ vi.mock('../src/world.js', async original => {
   const module = await original();
   return {...module, mountWorld:vi.fn(() => ({select:vi.fn(),borders:vi.fn(),updateOwners:vi.fn(),setWorks:vi.fn(),turn:vi.fn(),dispose:vi.fn()}))};
 });
-import {App} from '../src/App.jsx';
+import {CompetitionApp as App} from '../src/CompetitionApp.jsx';
 import {COMPETITION_KEY} from '../src/competition-storage.js';
 
 const source = name => readFileSync(resolve(process.cwd(),'public','entries',name), 'utf8');

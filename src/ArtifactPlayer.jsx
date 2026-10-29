@@ -8,7 +8,7 @@ export function CompetitionModal({title, children, onClose, wide = false}) {
     const dialog = ref.current; dialog.showModal();
     return () => dialog.close();
   }, []);
-  return <dialog ref={ref} className={`modal ${wide ? 'wide competition-wide' : ''}`} onCancel={onClose}
+  return <dialog ref={ref} aria-label={title} className={`modal ${wide ? 'wide competition-wide' : ''}`} onCancel={onClose}
     onClick={event => {if (event.target === ref.current) onClose();}}>
     <div className="modal-head"><span>{title}</span><button onClick={onClose} aria-label="닫기"><X size={21}/></button></div>
     {children}
